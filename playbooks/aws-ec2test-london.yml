@@ -106,7 +106,7 @@
          aws_secret_key: "{{ec2_secret_key}}"
          region: eu-west-2
          image_id: "{{ amitemplate.image_id }}"
-         key_name: myNewec2KeyPair
+         key_name: ecsWorkKeyPair
          security_groups: ['ansible-test']
          instance_type: t2.micro
 
@@ -143,6 +143,10 @@
                 - Type: forward 
                   TargetGroupName: "{{ elbtargetgroup.target_group_name }}"
          state: present
+      register: elb_application_lb
+    
+    - debug: 
+         msg: "The application loadbalancer URL is {{elb_application_lb.dns_name}}" 
 
     - name: Create an AutoScaling group of minimum 2 nodes to serve HTTP requests
       ec2_asg:
