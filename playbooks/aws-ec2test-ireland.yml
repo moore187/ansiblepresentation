@@ -1,0 +1,57 @@
+---
+
+- hosts: localhost
+  connection: local
+  gather_facts: False
+  become: yes
+
+  tasks:
+    
+    - name: Include variable folder
+      include_vars:
+        dir: config
+
+    - pip:
+        name: boto
+
+    - name: Provision a set of instances 
+      ec2:
+         key_name: irelandsshkey
+         aws_access_key: "{{ec2_access_key}}"
+         aws_secret_key: "{{ec2_secret_key}}"
+         group: grumpy-ritch-ireland
+         region: eu-west-1
+         instance_type: t2.micro
+         image: ami-e4515e0e
+         wait: true
+         exact_count: 1
+         count_tag:
+            Name: Demo
+         instance_tags:
+            Name: Demo
+      register: ec2
+
+    - name: Add all instance public IPs to host group
+      add_host: hostname={{ item.public_ip }} groups=ec2hosts
+      loop: "{{ ec2.instances }}"
+
+    - pause: seconds=15
+
+- hosts: ec2hosts
+  name: configure instances
+  connection: ssh
+  remote_user: ec2-user
+  gather_facts: true
+  become: yes
+  vars:
+    ansible_ssh_private_key_file: ~/.ssh/irelandsshkey.pem
+ 
+  tasks:
+
+     - name: Install HTTPD
+       yum:
+          name: httpd
+          state: latest
+
+     - name: Start HTTPD
+       service: name=httpd state=started enabled=yes
