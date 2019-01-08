@@ -57,7 +57,7 @@
         state: latest
     
     - name: Create a simple Coming Soon index.html page
-      shell: echo "Fortune of the day coming soon...." > /var/www/html/index.html
+      shell: echo "Ritchies website coming soon...." > /var/www/html/index.html
     
     - name: Start HTTPD
       service: name=httpd state=started enabled=yes
@@ -84,8 +84,8 @@
          name: "testAMI-{{ ansible_date_time.date }}"
          wait: yes
          tags:
-           Name: testAMIFCS
-           Service: testAMIFCS
+           Name: testAMIRMCS
+           Service: testAMIRMCS
       register: amitemplate
      
     - debug:
@@ -126,7 +126,7 @@
 
     - name: Add an application loadbalancer to serve HTTP requests. 
       elb_application_lb:
-         name: fotdcomingsoonlb
+         name: rmcomingsoonlb
          aws_access_key: "{{ec2_access_key}}"
          aws_secret_key: "{{ec2_secret_key}}"
          region: eu-west-2
@@ -146,7 +146,7 @@
 
     - name: Create an AutoScaling group of minimum 2 nodes to serve HTTP requests
       ec2_asg:
-         name: FortuneComingSoonASG
+         name: RitchieComingSoonASG
          aws_access_key: "{{ec2_access_key}}"
          aws_secret_key: "{{ec2_secret_key}}"
          launch_config_name: LondonLaunchConfig
